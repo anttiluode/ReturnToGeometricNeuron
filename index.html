@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Return to the Geometric Neuron</title>
+<meta name="description" content="Six copies of the 2025 ecg.json loop, wired to each other with hand-written rules. What they can keep through a seizure.">
+<style>
+:root{--bg:#13100e;--panel:#1c1815;--line:#3a322b;--ink:#ebe3d5;--dim:#a2978a;--amber:#e3aa4c;--teal:#5fbdaa;--rose:#ff6f8f;--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+*{box-sizing:border-box}
+html{background:var(--bg)}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:980px;margin:0 auto;padding:0 16px 80px}
+header{padding:56px 0 20px}
+.kicker{font:13px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--amber)}
+h1{font:400 clamp(34px,6vw,58px)/1.05 "Iowan Old Style",Palatino,Georgia,serif;margin:.25em 0 .35em;text-wrap:balance}
+h2{font:400 28px/1.2 "Iowan Old Style",Palatino,Georgia,serif;margin:64px 0 10px;text-wrap:balance}
+p{max-width:68ch;margin:.7em 0}
+.lede{font-size:20px;color:var(--ink)}
+a{color:var(--amber)}
+code{font:.88em var(--mono);color:var(--teal)}
+.stage{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;margin:26px 0 8px}
+.views{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
+@media(max-width:760px){.views{grid-template-columns:1fr}}
+canvas{width:100%;display:block;border-radius:10px;background:#0e0c0a}
+.row{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;margin-top:12px}
+.lab{font:12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--dim);min-width:92px}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+button{font:14px system-ui,sans-serif;color:var(--ink);background:#26211c;border:1px solid var(--line);border-radius:999px;padding:7px 14px;cursor:pointer}
+button:hover{border-color:var(--dim)}
+button:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+button[aria-pressed=true]{background:var(--amber);border-color:var(--amber);color:#1a1408;font-weight:600}
+button.go{border-color:var(--teal);color:var(--teal)}
+input[type=range]{accent-color:var(--amber);width:150px}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:14px}
+@media(max-width:760px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.stat{border:1px solid var(--line);border-radius:10px;padding:9px 12px}
+.stat b{display:block;font:500 22px var(--mono);font-variant-numeric:tabular-nums}
+.stat span{font-size:13px;color:var(--dim)}
+.phase{font:13px var(--mono);color:var(--amber);min-height:1.4em;margin-top:10px}
+.cap{font-size:14px;color:var(--dim);max-width:none}
+.tablewrap{overflow-x:auto;margin:14px 0}
+table{border-collapse:collapse;width:100%;font-size:15px;min-width:560px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--dim);font-weight:400}
+td.n{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.bar{display:inline-block;height:9px;border-radius:2px;background:var(--rose);vertical-align:middle;margin-right:8px;min-width:2px}
+.bar.ok{background:var(--teal)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media(max-width:760px){.two{grid-template-columns:1fr}}
+.card{border:1px solid var(--line);border-radius:12px;padding:6px 18px 12px;background:var(--panel)}
+.card h3{font:13px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--amber);margin:14px 0 6px;font-weight:400}
+.card li{margin:.45em 0}
+ul{padding-left:1.1em}
+footer{margin-top:70px;color:var(--dim);font-size:14px}
+</style>
+</head>
+<body>
+<main>
+<header>
+  <div class="kicker">PerceptionLab · ecg.json · 10 November 2026</div>
+  <h1>Return to the Geometric Neuron</h1>
+  <p class="lede">Six copies of the accidental 2025 loop, wired to each other. Nothing here is trained. The wiring and two small rules are written by hand, and the only thing that changes with experience is a number that was already in the file: every edge in <code>ecg.json</code> carries <code>learned_weight: 1.0</code>, and nothing ever wrote to it.</p>
+  <p>The finding in one line: <strong>a unit can only be taught by a beat it hears after it has forgotten its own.</strong> Use that as the writing rule and what the colony learned survives a seizure of any length, as long as the seizure is faster than the units can forget.</p>
+</header>
+
+<section class="stage" aria-label="Live colony">
+  <div class="views">
+    <canvas id="ring" width="900" height="760" role="img" aria-label="Six units in a ring. Each disc is the unit's checkerboard surface. Lines are the weights between them."></canvas>
+    <canvas id="ecg" width="900" height="760" role="img" aria-label="The reading of each unit over the last 600 ticks."></canvas>
+  </div>
+  <div class="phase" id="phase"></div>
+  <div class="row"><span class="lab">The world</span><div class="seg" id="world">
+    <button data-v="free" aria-pressed="true">Leave alone</button>
+    <button data-v="A">Teach 0→1→2→3</button>
+    <button data-v="B">Teach 3→2→1→0</button>
+    <button data-v="fast">Seizure, fast</button>
+    <button data-v="slow">Seizure, slow</button></div></div>
+  <div class="row"><span class="lab">Writing rule</span><div class="seg" id="rule">
+    <button data-v="news" aria-pressed="true">News</button>
+    <button data-v="hebb">Hebb</button>
+    <button data-v="none">Frozen</button></div></div>
+  <div class="row"><span class="lab">Speed</span><input id="speed" type="range" min="1" max="60" value="6" aria-label="Ticks per frame">
+    <button class="go" id="script">Run the whole experiment</button><button id="reset">Start over</button></div>
+  <div class="stats">
+    <div class="stat"><b id="s-t">0</b><span>ticks</span></div>
+    <div class="stat"><b id="s-o">+0.000</b><span>order held in the weights (+ is 0→3)</span></div>
+    <div class="stat"><b id="s-w">0</b><span>writes since the world last changed</span></div>
+    <div class="stat"><b id="s-a">6 / 6</b><span>units still beating</span></div>
+  </div>
+</section>
+<p class="cap">Left: each disc is one unit's checkerboard, drawn from its current square size. Amber rim: the unit still remembers a beat and cannot be taught. Teal rim: it has forgotten and is listening. A line is a weight; it flashes pink when it is written. Right: what each unit reads of itself. This page runs the same arithmetic as the Python experiments, checked to six decimals.</p>
+
+<h2>One unit beats when it forgets its last beat</h2>
+<p>That was this morning's result in <a href="https://github.com/anttiluode/GeometricNeuronOriginReview">GeometricNeuronOriginReview</a>. The controller keeps the last 50 readings. A beat leaves two huge readings in that memory, and while they sit there the loop is held quiet. When they fall out, it kicks, goes blind, and beats again: 59 ticks. It has a threshold, a refractory period and a reset, and nothing in it changes slowly. One attractor, no memory.</p>
+
+<h2>Where you listen on the surface decides what you hear</h2>
+<p>The splitter has 16 outputs. They are the top row of the checkerboard picture, and the loop only ever used the first four, the corner. From the corner, a unit is blind to its own kick just before the beat: it reads zero. Four outputs further along the same row, the same moment reads 3.75 to 4.0, as loud as the beat itself. So a neighbour listening mid-row hears the beat coming four ticks before the unit that is about to make it. This is the one place where the original idea, geometry on the surface, does real work.</p>
+<p>What one edge does, as its weight grows (16 random starts each):</p>
+<div class="tablewrap"><table>
+<tr><th>Weight</th><th>Listening mid-row (outputs 6–9)</th><th>Listening at the corner (outputs 0–3)</th></tr>
+<tr><td class="n">0.01 – 0.02</td><td>Ignored. The listener keeps its own time.</td><td>Ignored.</td></tr>
+<tr><td class="n">0.05 – 0.2</td><td>Locked at a fixed lag. Several lags are stable (6, 7, 8, 10, 15, 16, 56 ticks).</td><td>Locked. Up to seven different stable lags.</td></tr>
+<tr><td class="n">0.3 – 0.5</td><td>Silenced. The listener never beats again.</td><td>Locked, mostly at lag 0.</td></tr>
+<tr><td class="n">1.0</td><td>Silenced.</td><td>Silenced.</td></tr>
+</table></div>
+<p>Two things follow. A pair has several stable relationships where a single unit had one attractor, so relationships can hold something. And a strong edge here is not excitation: a heard beat counts as the listener's own, so it makes the listener refractory. Too much listening is silence.</p>
+
+<h2>Experience, seizure, release</h2>
+<p>Four of the six units are made to beat in order, 0→1→2→3 or 3→2→1→0, for 4,000 ticks. Then the colony is left alone. Then every unit is forced to beat together every 20 ticks: the seizure. Then it is left alone again and I ask what is left of the order. Three colonies, 12 random starts for each order.</p>
+<div class="tablewrap"><table>
+<tr><th>Colony</th><th>Order in the weights, before → after</th><th>Weight change during the seizure</th><th>After release</th></tr>
+<tr><td><strong>Frozen</strong><br>weights never change</td><td class="n">none</td><td class="n">0</td><td>The order lived only in the timing (+0.78 / −0.76). After any seizure it is exactly 0, and all six units beat identically for good. It never leaves the seizure.</td></tr>
+<tr><td><strong>Hebb</strong><br>write on coincidence</td><td class="n">−0.05 → −0.03</td><td class="n">0.05 / 0.20 / 0.54<br><span class="cap">for 1k / 4k / 16k ticks</span></td><td>Every synchronous beat writes every edge. After 16,000 ticks all weights are at the ceiling and all six units are silent. Before that point the history can still be guessed from the weights (21 of 24 after 4,000 ticks), because the seizure adds the same amount to every edge.</td></tr>
+<tr><td><strong>News</strong><br>write only when calm</td><td class="n">+0.20 → +0.13</td><td class="n">0.0001<br><span class="cap">for 1k, 4k and 16k alike</span></td><td>5.5 of 6 units beating, no two in step. The history is guessed correctly from the weights in 22 of 24 runs.</td></tr>
+</table></div>
+<p>The news rule writes about 5 times during the whole seizure, all on its first beat. After that every unit remembers a beat at every moment, so nothing it hears is news. The refractory window that makes the pulse also write-protects the unit.</p>
+<p>The loss from +0.20 to +0.13 does not happen in the seizure. It happens in the recovery, when the units come out in step, forget together, and write each other while they drift apart. Without a seizure the same stretch of ordinary life costs less (+0.20 → +0.19).</p>
+
+<h2>Where the protection ends</h2>
+<p>If the window is the write-protect, a seizure slower than the window should get through. I predicted the line would sit at the forgetting time, about 50 to 59 ticks, before running this.</p>
+<div class="tablewrap"><table>
+<tr><th>Seizure period (ticks)</th><th>Writes during 4,000 ticks of seizure</th><th>Units beating afterwards</th></tr>
+<tr><td class="n">10</td><td class="n"><span class="bar ok" style="width:2px"></span>5</td><td class="n">5.4</td></tr>
+<tr><td class="n">20</td><td class="n"><span class="bar ok" style="width:2px"></span>5</td><td class="n">5.5</td></tr>
+<tr><td class="n">30</td><td class="n"><span class="bar ok" style="width:2px"></span>17</td><td class="n">5.1</td></tr>
+<tr><td class="n">40</td><td class="n"><span class="bar ok" style="width:2px"></span>17</td><td class="n">5.3</td></tr>
+<tr><td class="n">50</td><td class="n"><span class="bar ok" style="width:2px"></span>5</td><td class="n">5.4</td></tr>
+<tr><td class="n">55</td><td class="n"><span class="bar ok" style="width:2px"></span>5</td><td class="n">5.4</td></tr>
+<tr><td class="n">60</td><td class="n"><span class="bar" style="width:117px"></span>6,372</td><td class="n">1.8</td></tr>
+<tr><td class="n">70</td><td class="n"><span class="bar" style="width:120px"></span>6,525</td><td class="n">0.5</td></tr>
+<tr><td class="n">90</td><td class="n"><span class="bar" style="width:114px"></span>6,213</td><td class="n">2.8</td></tr>
+</table></div>
+<p>The line is between 55 and 60. A slow common rhythm lets every unit forget between pulses, they all hear each other coming, and the colony writes itself into silence. Try "Seizure, slow" above.</p>
+
+<h2>How close is it to a neuron</h2>
+<div class="tablewrap"><table>
+<tr><th>A neuron has</th><th>The colony has</th><th>Standing</th></tr>
+<tr><td>Threshold, refractory period, reset</td><td>The forgetting clock</td><td>Measured, in one unit</td></tr>
+<tr><td>Synapses whose strength follows history</td><td><code>learned_weight</code>, written by the news rule</td><td>Measured, one task</td></tr>
+<tr><td>Timing-dependent writing: an input just before the spike counts, one just after does not</td><td>The same asymmetry, because after its own beat the unit is refractory</td><td>Resemblance only. Nothing here weakens an edge for arriving late.</td></tr>
+<tr><td>Scaling that keeps a quiet cell alive</td><td>A silent unit shrinks all its incoming weights together</td><td>Hand-written, and not strong enough: at four times the learning rate the colony dies</td></tr>
+<tr><td>Excitation and inhibition</td><td>Only one sign. A heard beat always quiets.</td><td>Missing</td></tr>
+<tr><td>Dendrites, cable, a graded response</td><td>Nothing</td><td>Missing. The response to a push is still all or none.</td></tr>
+</table></div>
+
+<h2>Ledger</h2>
+<div class="two">
+<div class="card"><h3>Shown</h3><ul>
+<li>The browser colony and the Python colony agree to six decimals over 5,000 ticks.</li>
+<li>Order of experience is written into the weights by the news rule (+0.20 against −0.20 for the reverse order) and read back from the weights after a seizure in 22 of 24 runs.</li>
+<li>Weight change during a fast seizure is 0.0001 whether it lasts 1,000 or 16,000 ticks.</li>
+<li>The protection ends where predicted, at the forgetting time.</li>
+<li>A colony with no slow state is locked in step for good by a single common beat.</li>
+</ul></div>
+<div class="card"><h3>Not shown</h3><ul>
+<li>That the memory is useful. After the seizure the order shows only weakly in the beating itself (+0.14 / −0.10, down from +0.29 / −0.25). The weights keep it better than the behaviour expresses it.</li>
+<li>That it lasts. Ordinary life keeps writing, and the order fades with no seizure at all.</li>
+<li>Unlearning. No rule here makes a weight smaller for a reason.</li>
+<li>Anything beyond six units, 12 starts per order, one task, one hebb rule as comparison.</li>
+<li>That the protection is a discovery. The gate was designed; what was measured is that this loop's own variance really does hold it shut, and exactly where it stops.</li>
+</ul></div>
+</div>
+
+<footer>
+<p>Built by Claude (Fable 5.2) with Antti Luode. Code, numbers and the full note: <a href="https://github.com/anttiluode/ReturnToGeometricNeuron">anttiluode/ReturnToGeometricNeuron</a>. Do not hype. Do not lie. Just show.</p>
+</footer>
+</main>
+
+<script src="taps.js"></script>
+<script src="colony.js"></script>
+<script>
+const N = 6, ring = document.getElementById('ring'), ecg = document.getElementById('ecg');
+const rx = ring.getContext('2d'), ex = ecg.getContext('2d');
+const C = { amber: '#e3aa4c', teal: '#5fbdaa', rose: '#ff6f8f', ink: '#ebe3d5', dim: '#a2978a', line: '#3a322b' };
+let col, world = 'free', kind = 'news', worldWrites = 0, trace, flash, beatGlow, script = null;
+const tile = document.createElement('canvas'); tile.width = tile.height = 32; const tx = tile.getContext('2d');
+
+function start() {
+  col = new Colony(N, { kind, random: true });
+  trace = Array.from({ length: N }, () => []); flash = new Map(); beatGlow = new Array(N).fill(0); worldWrites = 0;
+}
+function press(group, v) { document.querySelectorAll('#' + group + ' button').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === v)); }
+function setWorld(v) { world = v; worldWrites = col.writes; press('world', v); }
+document.querySelectorAll('#world button').forEach(b => b.onclick = () => { script = null; setWorld(b.dataset.v); say(''); });
+document.querySelectorAll('#rule button').forEach(b => b.onclick = () => { kind = b.dataset.v; col.kind = kind; press('rule', kind); });
+document.getElementById('reset').onclick = () => { script = null; start(); setWorld('free'); say(''); };
+document.getElementById('script').onclick = () => {
+  start(); document.getElementById('speed').value = 40;
+  script = [['A', 4000, 'Experience: units 0, 1, 2, 3 are made to beat in that order'], ['free', 1500, 'Left alone'],
+    ['fast', 3000, 'Seizure: every unit forced to beat together every 20 ticks'], ['free', 1e9, 'Released. Watch whether they fall out of step, and what the weights still hold']];
+  nextPhase();
+};
+let phaseEnd = 0;
+function nextPhase() { const p = script.shift(); setWorld(p[0]); phaseEnd = col.t + p[1]; say(p[2]); if (!script.length) script = null; }
+function say(s) { document.getElementById('phase').textContent = s; }
+
+function force() {
+  if (world === 'A') return paceForce(N, [0, 1, 2, 3], col.t);
+  if (world === 'B') return paceForce(N, [3, 2, 1, 0], col.t);
+  if (world === 'fast') return seizureForce(N, col.t, 20);
+  if (world === 'slow') return seizureForce(N, col.t, 60);
+  return null;
+}
+function tick() {
+  col.step(force());
+  for (let i = 0; i < N; i++) {
+    trace[i].push(col.own[i]); if (trace[i].length > 600) trace[i].shift();
+    if (col.own[i] > 3) beatGlow[i] = 1;
+  }
+  for (const [i, j] of col.wrote) flash.set(i + '-' + j, 1);
+  if (script && col.t >= phaseEnd) nextPhase();
+}
+function pos(i, w, h) { const a = -Math.PI / 2 + i * 2 * Math.PI / N, r = Math.min(w, h) * 0.34; return [w / 2 + r * Math.cos(a), h / 2 + r * Math.sin(a)]; }
+
+function drawSurface(q) {
+  const im = tx.createImageData(32, 32);
+  for (let y = 0; y < 32; y++) for (let x = 0; x < 32; x++) {
+    const v = q === 0 ? 0 : ((((Math.floor(x * 8 / q) + Math.floor(y * 8 / q)) % 2) + 2) % 2);
+    const k = (y * 32 + x) * 4, g = v ? 232 : 34; im.data[k] = g; im.data[k + 1] = g * 0.96; im.data[k + 2] = g * 0.88; im.data[k + 3] = 255;
+  }
+  tx.putImageData(im, 0, 0);
+}
+function drawRing() {
+  const w = ring.width, h = ring.height, R = 86; rx.clearRect(0, 0, w, h);
+  for (let i = 0; i < N; i++) for (let j = 0; j < N; j++) {
+    if (i === j) continue; const wt = col.w[i][j]; if (wt < 0.03 && !flash.get(i + '-' + j)) continue;
+    const [x1, y1] = pos(j, w, h), [x2, y2] = pos(i, w, h), dx = x2 - x1, dy = y2 - y1, L = Math.hypot(dx, dy), nx = -dy / L, ny = dx / L;
+    const ox = nx * 14, oy = ny * 14, sx = x1 + dx / L * R + ox, sy = y1 + dy / L * R + oy, tx2 = x2 - dx / L * (R + 10) + ox, ty2 = y2 - dy / L * (R + 10) + oy;
+    const f = flash.get(i + '-' + j) || 0;
+    rx.strokeStyle = f > 0.05 ? C.rose : C.ink; rx.globalAlpha = Math.min(1, 0.15 + wt * 2.2 + f * 0.6); rx.lineWidth = 1 + wt * 22;
+    rx.beginPath(); rx.moveTo(sx, sy); rx.lineTo(tx2, ty2); rx.stroke();
+    rx.fillStyle = rx.strokeStyle; rx.beginPath(); rx.arc(tx2, ty2, 4 + wt * 16, 0, 7); rx.fill(); rx.globalAlpha = 1;
+  }
+  for (let i = 0; i < N; i++) {
+    const [x, y] = pos(i, w, h); drawSurface(col.q[i]);
+    rx.save(); rx.beginPath(); rx.arc(x, y, R - 8, 0, 7); rx.clip(); rx.imageSmoothingEnabled = false; rx.drawImage(tile, x - R, y - R, 2 * R, 2 * R);
+    if (beatGlow[i] > 0.02) { rx.fillStyle = 'rgba(255,240,210,' + beatGlow[i] * 0.7 + ')'; rx.fillRect(x - R, y - R, 2 * R, 2 * R); }
+    rx.restore();
+    const quiet = col.t - col.lastBeat[i] > 200;
+    rx.lineWidth = 7; rx.strokeStyle = quiet ? C.line : (col.mode[i] === 1 ? C.teal : C.amber); rx.beginPath(); rx.arc(x, y, R - 4, 0, 7); rx.stroke();
+    rx.fillStyle = C.ink; rx.font = '600 30px ui-monospace,monospace'; rx.textAlign = 'center';
+    const [lx, ly] = [x + (x - w / 2) * 0.42, y + (y - h / 2) * 0.42]; rx.fillText(i, lx, ly + 10);
+  }
+  for (const k of flash.keys()) { const v = flash.get(k) * 0.9; v < 0.03 ? flash.delete(k) : flash.set(k, v); }
+  for (let i = 0; i < N; i++) beatGlow[i] *= 0.85;
+}
+function drawEcg() {
+  const w = ecg.width, h = ecg.height, rowH = h / N; ex.clearRect(0, 0, w, h);
+  for (let i = 0; i < N; i++) {
+    const base = (i + 1) * rowH - 22, t = trace[i];
+    ex.strokeStyle = C.line; ex.lineWidth = 1; ex.beginPath(); ex.moveTo(0, base); ex.lineTo(w, base); ex.stroke();
+    ex.strokeStyle = i < 4 ? C.amber : C.teal; ex.lineWidth = 2.5; ex.lineJoin = 'round'; ex.beginPath();
+    for (let k = 0; k < t.length; k++) { const X = w - (t.length - k) * (w / 600), Y = base - t[k] / 4 * (rowH - 40); k ? ex.lineTo(X, Y) : ex.moveTo(X, Y); }
+    ex.stroke(); ex.fillStyle = C.dim; ex.font = '26px ui-monospace,monospace'; ex.fillText('unit ' + i, 12, base - rowH + 54);
+  }
+}
+function stats() {
+  document.getElementById('s-t').textContent = col.t.toLocaleString('en-US');
+  const o = col.order(); document.getElementById('s-o').textContent = (o >= 0 ? '+' : '−') + Math.abs(o).toFixed(3);
+  document.getElementById('s-w').textContent = (col.writes - worldWrites).toLocaleString('en-US');
+  let a = 0; for (let i = 0; i < N; i++) if (col.t - col.lastBeat[i] <= 200) a++;
+  document.getElementById('s-a').textContent = a + ' / ' + N;
+}
+const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+function frame() { const n = still ? 1 : +document.getElementById('speed').value; for (let k = 0; k < n; k++) tick(); drawRing(); drawEcg(); stats(); requestAnimationFrame(frame); }
+start(); frame();
+</script>
+</body>
+</html>

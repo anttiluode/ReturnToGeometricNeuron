@@ -14,7 +14,7 @@
 
 Without a slow state the same colony is locked in step for good by one common beat. With an ordinary coincidence (Hebb) rule the seizure writes every edge until every unit is silent.
 
-Nothing is trained. There is no gradient anywhere.
+There is **no gradient-based training**. The original News rule performs local, state-gated weight updates; the fifth/sixth-round nearest-predecessor rule instead counts **externally forced** teaching events and computes weights from those counts after teaching. That distinction is central to the evidence.
 
 ## The one idea
 
@@ -226,11 +226,11 @@ The next genuinely discriminating experiment, if pursued, is to train over **uns
 - A colony of identical units never leaves a seizure. Unequal weights suffice to break that (P2).
 - With weights frozen, learned order returns in the beats after a seizure and influence is directed (P2, P3).
 - The untrained loop gates a heard pulse by arrival phase (P1).
+- **The engineered nearest-predecessor rule does construct a bidirectional adjacency pattern from the forced teaching schedule** and supports cue-sensitive replay (round five). Round six shows it works for teaching gaps 1–5 ticks but not 6 or 8; the rule therefore does not generalize outside its hand-selected eligibility window.
 
 **Not shown**
 
-- That the memory is useful. It has not been set against any task or any simple sequence-memory baseline.
-- A new, engineered nearest-predecessor learning rule can construct bidirectional adjacency and support cue-sensitive replay in the fifth round. Generalization and learned arbitrary-context selection remain unshown.
+- A *self-generated*, state-dependent learning rule that discovers the chain: not shown. In round five, the oscillators' own phase and internal state do not determine credit; the teaching schedule alone suffices to reconstruct the learned weight matrix. No general task benefit beyond this engineered sequence-replay test has been established.
 - That it lasts. Ordinary life keeps writing; the order fades without any seizure.
 - Unlearning. No rule makes a weight smaller for a reason.
 - Scale. Six units, 12 starts per history, one task, one Hebb variant.
@@ -252,6 +252,7 @@ python experiments/phase.py                  # about 4 minutes, writes results/p
 python experiments/cue.py                    # about 5 minutes, writes results/cue.json
 python experiments/ideal_chain.py            # exact two-direction adjacency control; writes results/ideal_chain.json
 python experiments/tap_learning_round5.py    # learned adjacency / tap-filter ablations; writes results/tap_learning_round5.json
+python experiments/round5_check.py           # Fable's 1–8-tick gap and teaching-order controls; writes results/round5_check.json
 python -m unittest discover -s tests -v      # 6 tests
 node tests/parity.js                         # browser arithmetic against Python
 python experiments/make_taps.py /path/to/GeometricNeuronOriginReview   # rebuilds gn/taps.json from the archived nodes

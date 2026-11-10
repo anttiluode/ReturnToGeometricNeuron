@@ -69,6 +69,42 @@ Three things to read from it:
 
 **C3. Where the protection ends.** The table at the top.
 
+## Second round: timing, and the control that was missing
+
+Sol (ChatGPT) read the code and raised two points. Both were right to raise. `experiments/phase.py`, numbers in `results/phase.json`.
+
+**P1. One heard pulse at each of the 59 phases** of a lone, untrained unit. Entry: how many ticks later the next beat comes.
+
+| Weight of the pulse | Effect |
+|---|---|
+| 0.05, 0.1 | none at any phase |
+| 0.2 | none, except on 3 ticks in every 8 (phases 8–10, 16–18, 24–26, 32–34, 40–42), where the beat comes 55 ticks late |
+| 0.3 | every phase from 6 to 51; alternates within each 8 ticks between "delay = phase" and "delay ≈ 55" |
+| 0.5, 1.0 | delay = phase for phases 2–55: the unit restarts its clock from the heard beat. No effect in the last three ticks, when its own beat is already on the way |
+
+So the loop already gates input by arrival time, on two scales: the 59-tick cycle and an 8-tick ripple inside it (8 is twice the loop delay; that it is the idle ripple is my reading, not tested by varying the delay). A pulse never advances the beat. There is still only one sign.
+
+**P2. Is recovery owed to learning or only to unequal weights?** Each learned weight set, frozen, against the same set with unit labels shuffled, frozen. 1,000-tick seizure, 12 starts per history.
+
+| | Learned | Shuffled |
+|---|---|---|
+| Pairs beating identically after release | none | none |
+| Order in the beats, A / B | +0.25 / −0.23 | +0.03 / −0.03 |
+| Runs with the right order | 22 of 24 | 14 of 24 |
+
+Falling out of step needs only inequality. The earlier claim about the frozen colony is narrowed accordingly: it applied to identical units. What learning adds is the order, and with weights held still it returns in the beating at nearly full strength (+0.29 / −0.25 before the seizure). The weaker figure in C2 (+0.14 / −0.10) came from the colony rewriting itself during recovery, not from the memory failing to show.
+
+**P3. Direction of influence.** Weights frozen, one unit made to beat once, shift of each other unit's next beat measured against an untouched copy.
+
+| | Leader → follower | Follower → leader | Runs where leader moves follower more |
+|---|---|---|---|
+| Learned | 14.2 ticks | 5.2 ticks | 22 of 24 |
+| Shuffled | 14.4 ticks | 16.3 ticks | 12 of 24 |
+
+Sol also noted that the C2 summaries for 1k, 4k and 16k seizures are identical. They are: the forcing is periodic and the colony is deterministic, so after the first few pulses nothing more changes. That is a repeatable regime of this model, and says little about a biological seizure.
+
+**How the MIT theta study (Broschard et al., Cell Reports, Nov 2026) fits.** Only as a direction. It reports slow waves setting when faster activity can carry information, with the direction of influence between areas changing by task moment. P1 shows this loop has a slow cycle that gates input and a faster ripple nested in it; P3 shows learned, directed influence. Missing is the part that makes theirs cognition: the direction here is fixed by the weights and does not switch with what the colony is doing.
+
 ## How close to a neuron
 
 | A neuron has | The colony has | Standing |
@@ -88,11 +124,14 @@ Three things to read from it:
 - The news rule writes order (+0.20 for A against B) and the history is read back from the weights after a seizure in 22 of 24 runs.
 - Weight change in a fast seizure is 0.0001 at 1,000, 4,000 and 16,000 ticks.
 - The protection ends at the forgetting time, as predicted before the run.
-- A colony with no slow state never leaves a seizure.
+- A colony of identical units never leaves a seizure. Unequal weights suffice to break that (P2).
+- With weights frozen, learned order returns in the beats after a seizure and influence is directed (P2, P3).
+- The untrained loop gates a heard pulse by arrival phase (P1).
 
 **Not shown**
 
-- That the memory is useful. After the seizure the order shows only weakly in the beating (+0.14 / −0.10, from +0.29 / −0.25 before). The weights hold it better than the behaviour expresses it.
+- That the memory is useful. It has not been set against any task or any simple sequence-memory baseline.
+- Selection: two stored orders, one cue, the colony following the cued one with weights unchanged. This is the next test.
 - That it lasts. Ordinary life keeps writing; the order fades without any seizure.
 - Unlearning. No rule makes a weight smaller for a reason.
 - Scale. Six units, 12 starts per history, one task, one Hebb variant.
@@ -110,7 +149,8 @@ In order of how much I would bet on each:
 
 ```bash
 python experiments/colony.py                 # about 6 minutes on 4 cores, writes results/colony.json
-python -m unittest discover -s tests -v      # 5 tests
+python experiments/phase.py                  # about 4 minutes, writes results/phase.json
+python -m unittest discover -s tests -v      # 6 tests
 node tests/parity.js                         # browser arithmetic against Python
 python experiments/make_taps.py /path/to/GeometricNeuronOriginReview   # rebuilds gn/taps.json from the archived nodes
 ```

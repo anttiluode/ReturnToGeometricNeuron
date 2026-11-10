@@ -54,5 +54,13 @@ class TestColony(unittest.TestCase):
         self.assertGreater(rule.writes - n0, 2000)
 
 
+class TestPhase(unittest.TestCase):
+    def test_strong_pulse_resets_the_clock(self):
+        sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "experiments"))
+        import phase
+        self.assertEqual(phase.p1_job((1.0, 2))[2:56], list(range(2, 56)))
+        self.assertEqual(set(phase.p1_job((0.1, 2))), {0})
+
+
 if __name__ == "__main__":
     unittest.main()

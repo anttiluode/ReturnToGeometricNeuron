@@ -155,6 +155,34 @@ Cue minus no-cue advantages for the ideal chain were **+50.0 percentage points**
 
 **Next low-cost decision:** do not add theta or context units yet. Test whether learning *where an edge listens* (splitter tap index, which changes timing) can produce the required selectivity, with a frozen-tap and shuffled-tap comparison. Keep the ideal-chain score as the target, not an expectation.
 
+## Fifth round: local predecessor learning and sixteen-tap filtering
+
+**Completed and reproduced 10 November 2026.** [Code](experiments/tap_learning_round5.py) · [Numbers](results/tap_learning_round5.json) · [GitHub Actions](.github/workflows/tap-learning.yml).
+
+The fourth round demonstrated that a hand-specified bidirectional chain was sufficient for cue-sensitive replay. The fifth round asks whether experience can construct that chain and whether the **location of observation** contributes beyond learning the edges.
+
+We used exactly the six original ECG loops, their original geometry, and Fable's optional Q3 trigger with a 10-tick refractory. Training: sixteen alternating 500-tick A/B blocks, then 1,500 ticks without forcing. At each postsynaptic beat the **new engineered local rule** credits only the *nearest preceding* observed presynaptic beat if it occurred 1–5 ticks earlier, thus discouraging shortcuts. A separate 16-coefficient-per-edge filter is formed from how often a tap switched on 1–8 ticks before that postsynaptic beat, subtracting each tap's ordinary onset frequency. The edge gain was **hand calibrated** as `0.02 + 0.4 × predecessor_fraction`, with a cap of 0.35; the tap-filter readout uses 2× gain. We neither added neurons nor used backpropagation, but the temporal window and gain were engineered, not discovered. The new filter is activated only during testing, not during learning.
+
+Average directed edge strength: **0.1976** for six adjacent links among units 0–3, versus **0.0319** for the six non-adjacent shortcuts. The top observed taps on edge 0→1 were consistently **0, 1, 7, 6**, then 2 and 12—both the clean-beat and anticipatory channels, not predominantly idle channels.
+
+After freezing all learned coefficients, we compared 12 seeds × 8 checkpoints = 96 paired trials per condition. A cue forces a two-tick beat at unit 0 or 3. A strict success requires the first observed beats of units 0–3 to occur in order within 40 ticks.
+
+| Frozen test condition | Cue 0: 0123 | Cue 3: 3210 | No cue: 0123 | No cue: 3210 |
+|---|---:|---:|---:|---:|
+| Fable's original dual-order News weights | 7.3% | 1.0% | 1.0% | 1.0% |
+| Hand-specified ideal chain, contextual reference | 51.0% | 68.8% | 0.0% | 42.7% |
+| **Learned nearest-predecessor edges, fixed taps 0+1** | **68.8%** | **80.2%** | 3.1% | 32.3% |
+| Learned edges, fixed anticipatory taps 6+7 | 64.6% | 67.7% | 4.2% | 12.5% |
+| Learned edges and learned 16-tap filter | 65.6% | 66.7% | 12.5% | 17.7% |
+| Learned edges, randomized filter tap assignments | 3.1% | 0% | 3.1% | 0% |
+| Learned edges and filter, permuted neuron labels | 2.1% | 5.2% | 0% | 5.2% |
+
+Cue-minus-no-cue advantages for **learned edges with fixed 0+1 taps**: **+65.6 percentage points** forward (95% seed-bootstrap interval +54.2 to +77.1), **+47.9 points** backward (+32.3 to +65.6). With learned taps: +53.1 and +49.0 points. Shuffling learned tap assignments drove total beats over 300 ticks up to approximately 100, compared with approximately 35–42 for the usable routes: **idle chatter can destabilize a filter**.
+
+**Result and limitation.** The original News rule is not the only local rule possible. A deliberately specified *nearest preceding event* rule does construct adjacency from experience and supports cue-sensitive replay. But **the learned sixteen-tap filter does not outperform fixed beat-only taps 0+1**; the major contribution is learning *who is the next neighbour*, not yet learning a better geometrical observation. Shuffled taps establish that observation choice matters, not that this particular adaptive choice is optimal. In this task the trained A and B orders come from different endpoint cues; no arbitrary context-dependent switching has been learned. The rule was tailored to the teaching gap of 3 ticks (its credit window is 1–5), and generalization to different timings and tasks remains untested. Free-running replay is still substantial in some configurations.
+
+The next genuinely discriminating experiment, if pursued, is to train over **unseen and varied time gaps** while holding the learning rule and all thresholds fixed. Only if learned taps beat a well-chosen fixed-tap control there would we have evidence that adapting observation geometry has computational value beyond learning adjacency.
+
 ## How close to a neuron
 
 | A neuron has | The colony has | Standing |
@@ -181,7 +209,7 @@ Cue minus no-cue advantages for the ideal chain were **+50.0 percentage points**
 **Not shown**
 
 - That the memory is useful. It has not been set against any task or any simple sequence-memory baseline.
-- **Learned** selection: third-round dual-order weights do not work, although fourth-round hand-specified bidirectional adjacency does support cue-sensitive replay. Learning that adjacency is not yet achieved.
+- A new, engineered nearest-predecessor learning rule can construct bidirectional adjacency and support cue-sensitive replay in the fifth round. Generalization and learned arbitrary-context selection remain unshown.
 - That it lasts. Ordinary life keeps writing; the order fades without any seizure.
 - Unlearning. No rule makes a weight smaller for a reason.
 - Scale. Six units, 12 starts per history, one task, one Hebb variant.
@@ -202,6 +230,7 @@ python experiments/colony.py                 # about 6 minutes on 4 cores, write
 python experiments/phase.py                  # about 4 minutes, writes results/phase.json
 python experiments/cue.py                    # about 5 minutes, writes results/cue.json
 python experiments/ideal_chain.py            # exact two-direction adjacency control; writes results/ideal_chain.json
+python experiments/tap_learning_round5.py    # learned adjacency / tap-filter ablations; writes results/tap_learning_round5.json
 python -m unittest discover -s tests -v      # 6 tests
 node tests/parity.js                         # browser arithmetic against Python
 python experiments/make_taps.py /path/to/GeometricNeuronOriginReview   # rebuilds gn/taps.json from the archived nodes

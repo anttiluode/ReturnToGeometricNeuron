@@ -157,8 +157,18 @@ footer{margin-top:70px;color:var(--dim);font-size:14px}
 <tr><td>Plus a trigger: a heard beat can make the listener beat</td><td class="n">0.06</td><td class="n">0.09</td><td class="n">0.00, and a runaway: 378 beats where 14 is normal</td></tr>
 <tr><td>Plus a trigger and a 10-tick refractory</td><td class="n">0.51</td><td class="n">0.38</td><td class="n">0.07 / 0.01</td></tr>
 </table></div>
-<p>With a trigger and a short refractory, one stored order does replay from its head about half the time, and never backwards. But it also replays unprompted in over a third of windows, because any natural beat of the head unit starts it. Two orders in one colony could not be separated at any threshold I tried. The weights show why: taught one order, the edge to the next unit in line (0.14–0.23) stands clear of the edge two away (0.04–0.11). Taught both, every edge is 0.04–0.15 and the two overlap. Pairwise weights hold who beat near whom. They have no place to hold which order is meant.</p>
+<p>With a trigger and a short refractory, one stored order does replay from its head about half the time, and never backwards. But it also replays unprompted in over a third of windows, because any natural beat of the head unit starts it. Two orders in one colony could not be separated at any threshold I tried. The weights show why: taught one order, the edge to the next unit in line (0.14–0.23) stands clear of the edge two away (0.04–0.11). Taught both, every edge is 0.04–0.15 and the two overlap. Those learned weights retain temporal proximity but do not separate next-step edges from shortcuts. The fourth-round ideal-chain control below tests whether this is a limitation of the learned matrix rather than of pairwise weights themselves.</p>
 <p>The trigger and the refractory are my additions, not part of <code>ecg.json</code>, and were switched on only for this test.</p>
+<h2>Fourth round: give the dynamics an ideal bidirectional chain</h2>
+<p>Sol's follow-up was smaller than adding context units: leave the existing six-unit simulator, trigger and 10-tick refractory alone, and change only the frozen weights. What if immediate neighbours could excite each other in <em>both</em> directions (weight 0.22), while distant connections remained weak (0.02)? The cue is one beat at unit 0 or 3, and the score is the exact first-beat order within 40 ticks. Ninety-six paired trials per condition, checked in Python on GitHub Actions.</p>
+<div class="tablewrap"><table>
+<tr><th>Frozen connections</th><th>Cue 0: 0123</th><th>Cue 3: 3210</th><th>No cue: 0123</th><th>No cue: 3210</th></tr>
+<tr><td>News-learned two orders</td><td class="n">7.3%</td><td class="n">1.0%</td><td class="n">1.0%</td><td class="n">1.0%</td></tr>
+<tr><td><strong>Hand-specified bidirectional chain</strong></td><td class="n"><strong>62.5%</strong></td><td class="n"><strong>67.7%</strong></td><td class="n">12.5%</td><td class="n">27.1%</td></tr>
+<tr><td>Same ideal chain, unit labels shuffled</td><td class="n">6.3%</td><td class="n">1.0%</td><td class="n">4.2%</td><td class="n">0%</td></tr>
+<tr><td>Uniform connections</td><td class="n">2.1%</td><td class="n">0%</td><td class="n">1.0%</td><td class="n">0%</td></tr>
+</table></div>
+<p>The cue helps the ideal chain: +50.0 percentage points for 0123 and +40.6 for 3210, relative to matched no-cue probes. So these dynamics <em>can</em> express two directions without extra context units. The obstacle is that the News rule does not learn those local connections. The successful matrix was specified by hand; the result does not establish learned selection, biological theta organization, or reliable replay on every trial. <a href="https://github.com/anttiluode/ReturnToGeometricNeuron/blob/main/experiments/ideal_chain.py">Experiment code</a> · <a href="https://github.com/anttiluode/ReturnToGeometricNeuron/blob/main/results/ideal_chain.json">Results</a>.</p>
 <h2>How close is it to a neuron</h2>
 <div class="tablewrap"><table>
 <tr><th>A neuron has</th><th>The colony has</th><th>Standing</th></tr>
@@ -183,7 +193,7 @@ footer{margin-top:70px;color:var(--dim);font-size:14px}
 </ul></div>
 <div class="card"><h3>Not shown</h3><ul>
 <li>That the memory is useful. It orders beats and directs influence; it has not been set against any task or any simple sequence-memory baseline.</li>
-<li>Selection. Tested and not achieved: two orders in one colony could not be told apart by a cue.</li>
+<li><strong>Learned</strong> selection: the dual-order News weights still fail. Hand-specified local bidirectional weights do support cue-sensitive replay, but have not been learned.</li>
 <li>That it lasts. Ordinary life keeps writing, and the order fades with no seizure at all.</li>
 <li>Unlearning. No rule here makes a weight smaller for a reason.</li>
 <li>Anything beyond six units, 12 starts per order, one task, one hebb rule as comparison.</li>

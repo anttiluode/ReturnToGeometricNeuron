@@ -183,6 +183,27 @@ Cue-minus-no-cue advantages for **learned edges with fixed 0+1 taps**: **+65.6 p
 
 The next genuinely discriminating experiment, if pursued, is to train over **unseen and varied time gaps** while holding the learning rule and all thresholds fixed. Only if learned taps beat a well-chosen fixed-tap control there would we have evidence that adapting observation geometry has computational value beyond learning adjacency.
 
+## Sixth round: checking the fifth
+
+`experiments/round5_check.py`, numbers in `results/round5_check.json`. Sol's nearest-predecessor learner unchanged; only the spacing of the taught beats and the order of the teaching blocks vary. Fixed taps 0–1, 12 starts, 96 probes per row.
+
+| Ticks between taught beats | Adjacent weight | Shortcut weight | Cue 0: 0123 | Cue 3: 3210 | No cue: 0123 / 3210 |
+|---|---|---|---|---|---|
+| 1 | 0.218 | 0.028 | 59% | 72% | 7% / 28% |
+| 2 | 0.208 | 0.027 | 55% | 78% | 3% / 41% |
+| 3 (round five) | 0.198 | 0.032 | 69% | 80% | 3% / 32% |
+| 3, teaching ends on 0→3 instead | 0.197 | 0.032 | 78% | 68% | 31% / 5% |
+| 4 | 0.188 | 0.032 | 60% | 74% | 4% / 30% |
+| 5 | 0.179 | 0.033 | 66% | 72% | 8% / 24% |
+| 6 | 0.027 | 0.031 | 0% | 25% | 0% / 15% |
+| 8 | 0.027 | 0.029 | 0% | 17% | 0% / 13% |
+
+- The rule builds a clean chain at every spacing inside its 1–5 tick window and learns nothing outside it. At spacings 1 and 2 the unit two back is also inside the window and the chain is still clean, so the nearest-wins competition does real work.
+- The unprompted replay follows whichever order was taught last (row 4 against row 3). It is leftover timing, the fast memory of the first round, not the chain. Cue 3 "succeeds" 17–25% of the time even where nothing was learned. The cue-3 and no-cue-3210 figures in rounds four and five are inflated by about that much.
+- During teaching the beats of units 0–3 are forced and the weights stay at 0.02; the rule counts which forced beat preceded which and the weights are computed afterwards. The same weights would come from the schedule with no colony running. It learns order, not timing: replay runs at the trigger's five ticks per hop whatever was taught.
+
+**Open:** a rule in which the unit's own state takes part (as in the news rule) and which builds the chain (as the nearest-predecessor rule does).
+
 ## How close to a neuron
 
 | A neuron has | The colony has | Standing |

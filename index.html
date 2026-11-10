@@ -63,6 +63,7 @@ footer{margin-top:70px;color:var(--dim);font-size:14px}
   <h1>Return to the Geometric Neuron</h1>
   <p class="lede">Six copies of the accidental 2025 loop, wired to each other. Nothing here is trained. The wiring and two small rules are written by hand, and the only thing that changes with experience is a number that was already in the file: every edge in <code>ecg.json</code> carries <code>learned_weight: 1.0</code>, and nothing ever wrote to it.</p>
   <p>The finding in one line: <strong>a unit can only be taught by a beat it hears after it has forgotten its own.</strong> Use that as the writing rule and what the colony learned survives a seizure of any length, as long as the seizure is faster than the units can forget.</p>
+  <p class="cap" style="font-size:16px;color:var(--ink);border-left:3px solid var(--amber);padding-left:14px"><strong>Where it stands after six rounds.</strong> The loop is an excitable unit with a write-protect built into its own memory. A colony of them stores the order of experience in its weights and expresses it as directed influence. With a hand-added trigger and short refractory, a bidirectional chain replays in whichever direction it is cued, and a simple timing rule can build that chain from teaching. No rule here yet both uses the unit's own state and builds the chain, and nothing has been tested against a task. The rounds below are in the order they happened, mistakes included.</p>
 </header>
 
 <section class="stage" aria-label="Live colony">
@@ -181,12 +182,27 @@ footer{margin-top:70px;color:var(--dim);font-size:14px}
 <tr><td>Learned edges and filters, unit labels shuffled</td><td class="n">2.1%</td><td class="n">5.2%</td><td class="n">0%</td><td class="n">5.2%</td></tr>
 </table></div>
 <p>Across 12 random starts × 8 checkpoints, the learned immediately adjacent edges averaged <strong>0.198</strong>, while shortcuts averaged <strong>0.032</strong>. The local timing rule actually constructed a usable bidirectional chain. But the learned tap filter <strong>did not beat the simple fixed tap-0/1 detector</strong>. Shuffling learned taps broke routing and produced excess beats; tap identity matters, but this adaptive filter was not better than a known good observation.</p>
-<p>This is not yet a general learning system: the nearest-event window (1–5 ticks), gain, trigger and refractory were hand-chosen, and the training sequence has three-tick spacing. We did not test unseen temporal gaps or arbitrary context switching. <a href="https://github.com/anttiluode/ReturnToGeometricNeuron/blob/main/experiments/tap_learning_round5.py">Python experiment</a> · <a href="https://github.com/anttiluode/ReturnToGeometricNeuron/blob/main/results/tap_learning_round5.json">Complete data</a>.</p>
+<p>This is not yet a general learning system: the nearest-event window (1–5 ticks), gain, trigger and refractory were hand-chosen, and the training sequence has three-tick spacing. Other spacings are tested in the sixth round below; arbitrary context switching is untested. <a href="https://github.com/anttiluode/ReturnToGeometricNeuron/blob/main/experiments/tap_learning_round5.py">Python experiment</a> · <a href="https://github.com/anttiluode/ReturnToGeometricNeuron/blob/main/results/tap_learning_round5.json">Complete data</a>.</p>
+<h2>Sixth round: checking the fifth</h2>
+<p>Sol named the test his rule still owed: change the spacing of the taught beats without changing the rule. I ran his learner unchanged at seven spacings, and once more with the teaching blocks in the opposite order. Fixed taps 0–1, 12 starts, 96 probes per row.</p>
+<div class="tablewrap"><table>
+<tr><th>Ticks between taught beats</th><th>Adjacent weight</th><th>Shortcut weight</th><th>Cue 0: 0123</th><th>Cue 3: 3210</th></tr>
+<tr><td class="n">1</td><td class="n">0.218</td><td class="n">0.028</td><td class="n">59%</td><td class="n">72%</td></tr>
+<tr><td class="n">2</td><td class="n">0.208</td><td class="n">0.027</td><td class="n">55%</td><td class="n">78%</td></tr>
+<tr><td class="n">3 (as taught in round five)</td><td class="n">0.198</td><td class="n">0.032</td><td class="n">69%</td><td class="n">80%</td></tr>
+<tr><td class="n">4</td><td class="n">0.188</td><td class="n">0.032</td><td class="n">60%</td><td class="n">74%</td></tr>
+<tr><td class="n">5</td><td class="n">0.179</td><td class="n">0.033</td><td class="n">66%</td><td class="n">72%</td></tr>
+<tr><td class="n">6</td><td class="n">0.027</td><td class="n">0.031</td><td class="n">0%</td><td class="n">25%</td></tr>
+<tr><td class="n">8</td><td class="n">0.027</td><td class="n">0.029</td><td class="n">0%</td><td class="n">17%</td></tr>
+</table></div>
+<p>The rule builds a clean chain at every spacing inside its 1–5 tick window and learns nothing outside it. At spacings 1 and 2 the unit two back also falls inside the window, and the chain is still clean, so the "nearest one wins" competition is doing real work.</p>
+<p><strong>A confound in the no-cue numbers.</strong> In round five the order 3210 appeared unprompted in 32% of probes and 0123 in 3%. The teaching there ends on a 3→0 block. End it on a 0→3 block and the numbers swap: 0123 unprompted 31%, 3210 5%. So that unprompted replay is timing left over from the last thing taught, the same fast memory the frozen colony showed in the first round. It is also why cue 3 still "succeeds" 17–25% of the time at spacings 6 and 8, where nothing was learned. The cue-3 column in rounds four and five is inflated by about that much.</p>
+<p><strong>What the rule is.</strong> During teaching the beats of units 0–3 are set by the schedule and the weights stay at 0.02. The rule counts which forced beat came before which, and the weights are computed from the counts afterwards. The same weights would come from the schedule alone, with no colony running. It also learns order and not timing: replay runs at the trigger's five ticks per hop whatever spacing was taught. <a href="https://github.com/anttiluode/ReturnToGeometricNeuron/blob/main/experiments/round5_check.py">Check code</a> · <a href="https://github.com/anttiluode/ReturnToGeometricNeuron/blob/main/results/round5_check.json">Numbers</a>.</p>
 <h2>How close is it to a neuron</h2>
 <div class="tablewrap"><table>
 <tr><th>A neuron has</th><th>The colony has</th><th>Standing</th></tr>
 <tr><td>Threshold, refractory period, reset</td><td>The forgetting clock</td><td>Measured, in one unit</td></tr>
-<tr><td>Synapses whose strength follows history</td><td><code>learned_weight</code>, written by the news rule</td><td>Measured, one task</td></tr>
+<tr><td>Synapses whose strength follows history</td><td><code>learned_weight</code>, written by the news rule (gated by the unit's own state) or the nearest-predecessor rule (a count over the teaching schedule)</td><td>Measured, one task each. No rule yet does both: uses the unit's state and builds a usable chain</td></tr>
 <tr><td>Timing-dependent writing: an input just before the spike counts, one just after does not</td><td>The same asymmetry, because after its own beat the unit is refractory</td><td>Resemblance only. Nothing here weakens an edge for arriving late.</td></tr>
 <tr><td>Scaling that keeps a quiet cell alive</td><td>A silent unit shrinks all its incoming weights together</td><td>Hand-written, and not strong enough: at four times the learning rate the colony dies</td></tr>
 <tr><td>Excitation and inhibition</td><td>One sign natively. A hand-written trigger was added for the third round.</td><td>Bolted on, not learned with</td></tr>
@@ -203,10 +219,14 @@ footer{margin-top:70px;color:var(--dim);font-size:14px}
 <li>A colony of identical units is locked in step for good by a single common beat. Unequal weights are enough to break that; learning is not needed for it.</li>
 <li>With weights frozen after learning, the order returns in the beating after a seizure (22 of 24 runs; shuffled weights 14 of 24), and a leader moves its follower three times as far as the reverse.</li>
 <li>The untrained loop gates a heard pulse by its arrival time, on the 59-tick cycle and on an 8-tick ripple inside it.</li>
+<li>With a hand-added trigger and 10-tick refractory, one bidirectional chain replays in the cued direction: 63% and 68% hand-set, 69% and 80% learned (both figures include some leftover-timing inflation on the second direction).</li>
+<li>The nearest-predecessor rule builds that chain from teaching at every spacing from 1 to 5 ticks, and at none beyond its window.</li>
 </ul></div>
 <div class="card"><h3>Not shown</h3><ul>
 <li>That the memory is useful. It orders beats and directs influence; it has not been set against any task or any simple sequence-memory baseline.</li>
-<li>The new fifth-round nearest-predecessor learning rule does construct local bidirectional connections and supports cue-sensitive replay; arbitrary context switching and unseen-gap generalization remain unshown.</li>
+<li>A learning rule in which the unit's own state takes part and which builds the chain. The news rule has the first property, the nearest-predecessor rule the second.</li>
+<li>Clean no-cue baselines for rounds four and five. Leftover timing from the last teaching block inflates them.</li>
+<li>Context switching beyond two directions of one chain cued at opposite ends.</li>
 <li>That it lasts. Ordinary life keeps writing, and the order fades with no seizure at all.</li>
 <li>Unlearning. No rule here makes a weight smaller for a reason.</li>
 <li>Anything beyond six units, 12 starts per order, one task, one hebb rule as comparison.</li>
@@ -215,7 +235,7 @@ footer{margin-top:70px;color:var(--dim);font-size:14px}
 </div>
 
 <footer>
-<p>Built by Claude (Fable 5.2) with Antti Luode. Code, numbers and the full note: <a href="https://github.com/anttiluode/ReturnToGeometricNeuron">anttiluode/ReturnToGeometricNeuron</a>. Do not hype. Do not lie. Just show.</p>
+<p>Built by Claude (Fable 5.2) with Antti Luode. Rounds four and five and the controls that corrected rounds one and three are by Sol (ChatGPT). Code, numbers and the full note: <a href="https://github.com/anttiluode/ReturnToGeometricNeuron">anttiluode/ReturnToGeometricNeuron</a>. Do not hype. Do not lie. Just show.</p>
 </footer>
 </main>
 

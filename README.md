@@ -134,6 +134,27 @@ Two facts about the geometry found on the way:
 
 The trigger and the refractory are hand-written additions that are not in `ecg.json`. They were switched on only at test time; the colony did not learn with them.
 
+## Fourth round: ideal bidirectional chain isolates the missing capability
+
+**Confirmed on GitHub Actions, 10 November 2026.** [Experiment](experiments/ideal_chain.py), [machine-readable results](results/ideal_chain.json), [verification workflow](.github/workflows/ideal-chain.yml).
+
+The third round could not select two orders from learned weights. Does this mean the trigger/refractory dynamics cannot support it, or only that the News rule learned the wrong adjacency structure? We kept the **same six units, same trigger and 10-tick refractory, same trained starting states**; we froze weights throughout the probe. The only difference was the weight matrix.
+
+Primary, set before running: immediate-neighbour edges bidirectional at 0.22, all other off-diagonal edges at 0.02; trigger threshold 0.25. Two endpoint cues (unit 0 or 3) and no-cue controls were tested from the same saved state. Strict success: first beats of units 0–3 appear in the specified order within 40 ticks. There were 12 starting seeds × 8 checkpoints = 96 paired trials per condition.
+
+| Condition (weights frozen) | Cue 0: 0123 | Cue 3: 3210 | No cue: 0123 | No cue: 3210 |
+|---|---:|---:|---:|---:|
+| Learned AB | 7.3% | 1.0% | 1.0% | 1.0% |
+| **Hand-set bidirectional chain** | **62.5%** | **67.7%** | 12.5% | 27.1% |
+| Same ideal weights, shuffled unit labels | 6.3% | 1.0% | 4.2% | 0% |
+| Uniform 0.02 | 2.1% | 0% | 1.0% | 0% |
+
+Cue minus no-cue advantages for the ideal chain were **+50.0 percentage points** forward (seed-bootstrap 95% interval +39.6 to +61.5), **+40.6** reverse (+29.2 to +54.2). The cue did not produce the opposite exact sequence in either direction. All six existing Python tests passed in the workflow.
+
+**Interpretation:** The existing trigger/refractory dynamics can express two directions with hand-specified local connectivity, and endpoint cues make them more likely. Thus the third-round failure does **not** prove that another context neuron is necessary. It exposes a representation/learning bottleneck: the News rule does not reliably produce the local bidirectional structure. This is **not** proof of learned two-sequence selection, because the successful weights were designed, not learned; endpoint cues are different inputs, not a general context switch; and exact replay remains imperfect and sometimes spontaneous.
+
+**Next low-cost decision:** do not add theta or context units yet. Test whether learning *where an edge listens* (splitter tap index, which changes timing) can produce the required selectivity, with a frozen-tap and shuffled-tap comparison. Keep the ideal-chain score as the target, not an expectation.
+
 ## How close to a neuron
 
 | A neuron has | The colony has | Standing |
@@ -160,7 +181,7 @@ The trigger and the refractory are hand-written additions that are not in `ecg.j
 **Not shown**
 
 - That the memory is useful. It has not been set against any task or any simple sequence-memory baseline.
-- Selection. Tested in the third round and not achieved: two orders in one set of pairwise weights could not be told apart by a cue.
+- **Learned** selection: third-round dual-order weights do not work, although fourth-round hand-specified bidirectional adjacency does support cue-sensitive replay. Learning that adjacency is not yet achieved.
 - That it lasts. Ordinary life keeps writing; the order fades without any seizure.
 - Unlearning. No rule makes a weight smaller for a reason.
 - Scale. Six units, 12 starts per history, one task, one Hebb variant.
@@ -180,6 +201,7 @@ In order of how much I would bet on each:
 python experiments/colony.py                 # about 6 minutes on 4 cores, writes results/colony.json
 python experiments/phase.py                  # about 4 minutes, writes results/phase.json
 python experiments/cue.py                    # about 5 minutes, writes results/cue.json
+python experiments/ideal_chain.py            # exact two-direction adjacency control; writes results/ideal_chain.json
 python -m unittest discover -s tests -v      # 6 tests
 node tests/parity.js                         # browser arithmetic against Python
 python experiments/make_taps.py /path/to/GeometricNeuronOriginReview   # rebuilds gn/taps.json from the archived nodes

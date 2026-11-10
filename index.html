@@ -149,6 +149,16 @@ footer{margin-top:70px;color:var(--dim);font-size:14px}
 </table></div>
 <p>Sol was right about the first row: falling out of step needs only unequal weights, not learning. What learning adds is the next three rows. The order comes back in the beating itself after the seizure, nearly at full strength (+0.29 / −0.25 before), and influence has a direction: a taught leader moves its follower nearly three times as far as the follower moves it. With shuffled weights there is no direction.</p>
 <p>This also corrects my first ledger. The weak order in the beats after a seizure (+0.14 / −0.10) was not the memory failing to express itself. It was the colony rewriting itself during recovery. Hold the weights still and the behaviour returns.</p>
+<h2>Third round: two orders, one cue</h2>
+<p>The test Sol proposed: teach both orders into one colony, freeze the weights, make unit 0 or unit 3 beat once, and see whether the colony follows the cued order. It did not. The numbers are the fraction of 96 trials in which units 0–3 beat in exactly the cued order within 40 ticks.</p>
+<div class="tablewrap"><table>
+<tr><th>Colony</th><th>Taught one order, matching cue</th><th>Same, no cue at all</th><th>Taught both orders</th></tr>
+<tr><td>As it was: a heard beat only quiets</td><td class="n">0.09</td><td class="n">0.10</td><td class="n">0.00 – 0.01</td></tr>
+<tr><td>Plus a trigger: a heard beat can make the listener beat</td><td class="n">0.06</td><td class="n">0.09</td><td class="n">0.00, and a runaway: 378 beats where 14 is normal</td></tr>
+<tr><td>Plus a trigger and a 10-tick refractory</td><td class="n">0.51</td><td class="n">0.38</td><td class="n">0.07 / 0.01</td></tr>
+</table></div>
+<p>With a trigger and a short refractory, one stored order does replay from its head about half the time, and never backwards. But it also replays unprompted in over a third of windows, because any natural beat of the head unit starts it. Two orders in one colony could not be separated at any threshold I tried. The weights show why: taught one order, the edge to the next unit in line (0.14–0.23) stands clear of the edge two away (0.04–0.11). Taught both, every edge is 0.04–0.15 and the two overlap. Pairwise weights hold who beat near whom. They have no place to hold which order is meant.</p>
+<p>The trigger and the refractory are my additions, not part of <code>ecg.json</code>, and were switched on only for this test.</p>
 <h2>How close is it to a neuron</h2>
 <div class="tablewrap"><table>
 <tr><th>A neuron has</th><th>The colony has</th><th>Standing</th></tr>
@@ -156,7 +166,7 @@ footer{margin-top:70px;color:var(--dim);font-size:14px}
 <tr><td>Synapses whose strength follows history</td><td><code>learned_weight</code>, written by the news rule</td><td>Measured, one task</td></tr>
 <tr><td>Timing-dependent writing: an input just before the spike counts, one just after does not</td><td>The same asymmetry, because after its own beat the unit is refractory</td><td>Resemblance only. Nothing here weakens an edge for arriving late.</td></tr>
 <tr><td>Scaling that keeps a quiet cell alive</td><td>A silent unit shrinks all its incoming weights together</td><td>Hand-written, and not strong enough: at four times the learning rate the colony dies</td></tr>
-<tr><td>Excitation and inhibition</td><td>Only one sign. A heard beat always quiets.</td><td>Missing</td></tr>
+<tr><td>Excitation and inhibition</td><td>One sign natively. A hand-written trigger was added for the third round.</td><td>Bolted on, not learned with</td></tr>
 <tr><td>Dendrites, cable, a graded response</td><td>Nothing</td><td>Missing. The response to a push is still all or none.</td></tr>
 </table></div>
 
@@ -173,7 +183,7 @@ footer{margin-top:70px;color:var(--dim);font-size:14px}
 </ul></div>
 <div class="card"><h3>Not shown</h3><ul>
 <li>That the memory is useful. It orders beats and directs influence; it has not been set against any task or any simple sequence-memory baseline.</li>
-<li>Selection. Nobody has shown the colony holding two orders and following one or the other from a cue.</li>
+<li>Selection. Tested and not achieved: two orders in one colony could not be told apart by a cue.</li>
 <li>That it lasts. Ordinary life keeps writing, and the order fades with no seizure at all.</li>
 <li>Unlearning. No rule here makes a weight smaller for a reason.</li>
 <li>Anything beyond six units, 12 starts per order, one task, one hebb rule as comparison.</li>

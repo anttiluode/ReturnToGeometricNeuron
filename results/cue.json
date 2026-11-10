@@ -1,0 +1,147 @@
+{
+ "Q1_memory_route_only": {
+  "A": {
+   "cue0_head_first_all_follow": 0.13541666666666666,
+   "cue3_head_first_all_follow": 0.3125,
+   "cue0_runs_0123_exactly": 0.09375,
+   "cue3_runs_3210_exactly": 0.0,
+   "no_cue_runs_0123_exactly": 0.10416666666666667,
+   "no_cue_runs_3210_exactly": 0.0,
+   "beats_in_300_ticks_after_cue": 27.770833333333332
+  },
+  "B": {
+   "cue0_head_first_all_follow": 0.3020833333333333,
+   "cue3_head_first_all_follow": 0.14583333333333334,
+   "cue0_runs_0123_exactly": 0.0,
+   "cue3_runs_3210_exactly": 0.08333333333333333,
+   "no_cue_runs_0123_exactly": 0.0,
+   "no_cue_runs_3210_exactly": 0.08333333333333333,
+   "beats_in_300_ticks_after_cue": 27.578125
+  },
+  "AB": {
+   "cue0_head_first_all_follow": 0.020833333333333332,
+   "cue3_head_first_all_follow": 0.020833333333333332,
+   "cue0_runs_0123_exactly": 0.0,
+   "cue3_runs_3210_exactly": 0.010416666666666666,
+   "no_cue_runs_0123_exactly": 0.0,
+   "no_cue_runs_3210_exactly": 0.010416666666666666,
+   "beats_in_300_ticks_after_cue": 14.140625
+  }
+ },
+ "Q2_trigger_theta0.2": {
+  "A": {
+   "cue0_head_first_all_follow": 0.6458333333333334,
+   "cue3_head_first_all_follow": 0.4583333333333333,
+   "cue0_runs_0123_exactly": 0.0625,
+   "cue3_runs_3210_exactly": 0.0,
+   "no_cue_runs_0123_exactly": 0.09375,
+   "no_cue_runs_3210_exactly": 0.0,
+   "beats_in_300_ticks_after_cue": 136.88541666666666
+  },
+  "B": {
+   "cue0_head_first_all_follow": 0.4583333333333333,
+   "cue3_head_first_all_follow": 0.6354166666666666,
+   "cue0_runs_0123_exactly": 0.0,
+   "cue3_runs_3210_exactly": 0.052083333333333336,
+   "no_cue_runs_0123_exactly": 0.0,
+   "no_cue_runs_3210_exactly": 0.052083333333333336,
+   "beats_in_300_ticks_after_cue": 139.3125
+  },
+  "AB": {
+   "cue0_head_first_all_follow": 0.16666666666666666,
+   "cue3_head_first_all_follow": 0.17708333333333334,
+   "cue0_runs_0123_exactly": 0.0,
+   "cue3_runs_3210_exactly": 0.0,
+   "no_cue_runs_0123_exactly": 0.0,
+   "no_cue_runs_3210_exactly": 0.0,
+   "beats_in_300_ticks_after_cue": 377.5625
+  }
+ },
+ "Q3_theta0.15_refractory": {
+  "A": {
+   "cue0_head_first_all_follow": 0.5104166666666666,
+   "cue3_head_first_all_follow": 0.4375,
+   "cue0_runs_0123_exactly": 0.0,
+   "cue3_runs_3210_exactly": 0.0,
+   "no_cue_runs_0123_exactly": 0.0,
+   "no_cue_runs_3210_exactly": 0.0,
+   "beats_in_300_ticks_after_cue": 88.94791666666667
+  },
+  "B": {
+   "cue0_head_first_all_follow": 0.4479166666666667,
+   "cue3_head_first_all_follow": 0.5625,
+   "cue0_runs_0123_exactly": 0.0,
+   "cue3_runs_3210_exactly": 0.0,
+   "no_cue_runs_0123_exactly": 0.0,
+   "no_cue_runs_3210_exactly": 0.0,
+   "beats_in_300_ticks_after_cue": 81.97916666666667
+  },
+  "AB": {
+   "cue0_head_first_all_follow": 0.375,
+   "cue3_head_first_all_follow": 0.4895833333333333,
+   "cue0_runs_0123_exactly": 0.0,
+   "cue3_runs_3210_exactly": 0.0,
+   "no_cue_runs_0123_exactly": 0.0,
+   "no_cue_runs_3210_exactly": 0.0,
+   "beats_in_300_ticks_after_cue": 98.984375
+  }
+ },
+ "Q3_theta0.2_refractory": {
+  "A": {
+   "cue0_head_first_all_follow": 0.8229166666666666,
+   "cue3_head_first_all_follow": 0.5416666666666666,
+   "cue0_runs_0123_exactly": 0.07291666666666667,
+   "cue3_runs_3210_exactly": 0.0,
+   "no_cue_runs_0123_exactly": 0.16666666666666666,
+   "no_cue_runs_3210_exactly": 0.0,
+   "beats_in_300_ticks_after_cue": 34.229166666666664
+  },
+  "B": {
+   "cue0_head_first_all_follow": 0.5416666666666666,
+   "cue3_head_first_all_follow": 0.8125,
+   "cue0_runs_0123_exactly": 0.0,
+   "cue3_runs_3210_exactly": 0.052083333333333336,
+   "no_cue_runs_0123_exactly": 0.0,
+   "no_cue_runs_3210_exactly": 0.08333333333333333,
+   "beats_in_300_ticks_after_cue": 33.536458333333336
+  },
+  "AB": {
+   "cue0_head_first_all_follow": 0.4479166666666667,
+   "cue3_head_first_all_follow": 0.3541666666666667,
+   "cue0_runs_0123_exactly": 0.0625,
+   "cue3_runs_3210_exactly": 0.041666666666666664,
+   "no_cue_runs_0123_exactly": 0.03125,
+   "no_cue_runs_3210_exactly": 0.041666666666666664,
+   "beats_in_300_ticks_after_cue": 73.29166666666667
+  }
+ },
+ "Q3_theta0.25_refractory": {
+  "A": {
+   "cue0_head_first_all_follow": 0.7083333333333334,
+   "cue3_head_first_all_follow": 0.4583333333333333,
+   "cue0_runs_0123_exactly": 0.5104166666666666,
+   "cue3_runs_3210_exactly": 0.0,
+   "no_cue_runs_0123_exactly": 0.375,
+   "no_cue_runs_3210_exactly": 0.0,
+   "beats_in_300_ticks_after_cue": 33.979166666666664
+  },
+  "B": {
+   "cue0_head_first_all_follow": 0.4791666666666667,
+   "cue3_head_first_all_follow": 0.7083333333333334,
+   "cue0_runs_0123_exactly": 0.0,
+   "cue3_runs_3210_exactly": 0.4895833333333333,
+   "no_cue_runs_0123_exactly": 0.0,
+   "no_cue_runs_3210_exactly": 0.34375,
+   "beats_in_300_ticks_after_cue": 33.901041666666664
+  },
+  "AB": {
+   "cue0_head_first_all_follow": 0.4791666666666667,
+   "cue3_head_first_all_follow": 0.2604166666666667,
+   "cue0_runs_0123_exactly": 0.07291666666666667,
+   "cue3_runs_3210_exactly": 0.010416666666666666,
+   "no_cue_runs_0123_exactly": 0.010416666666666666,
+   "no_cue_runs_3210_exactly": 0.010416666666666666,
+   "beats_in_300_ticks_after_cue": 25.901041666666668
+  }
+ }
+}

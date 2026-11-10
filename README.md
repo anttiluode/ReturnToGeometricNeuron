@@ -105,6 +105,35 @@ Sol also noted that the C2 summaries for 1k, 4k and 16k seizures are identical. 
 
 **How the MIT theta study (Broschard et al., Cell Reports, Nov 2026) fits.** Only as a direction. It reports slow waves setting when faster activity can carry information, with the direction of influence between areas changing by task moment. P1 shows this loop has a slow cycle that gates input and a faster ripple nested in it; P3 shows learned, directed influence. Missing is the part that makes theirs cognition: the direction here is fixed by the weights and does not switch with what the colony is doing.
 
+## Third round: two stored orders, one cue (not achieved)
+
+`experiments/cue.py`, numbers in `results/cue.json`. A colony is taught 0→1→2→3 only, 3→2→1→0 only, or both in alternating blocks. Weights are frozen, then unit 0 or unit 3 is made to beat once. Entry: fraction of 96 trials in which units 0–3 then beat in exactly the cued order within 40 ticks.
+
+| Colony | Taught | Cue 0 → 0123 | Cue 3 → 3210 | No cue: 0123 / 3210 | Beats in 300 ticks |
+|---|---|---|---|---|---|
+| As it was (heard beats only quiet) | one order | 0.09 | 0.08 | 0.10 / 0.08 | 28 |
+| | both | 0.00 | 0.01 | 0.00 / 0.01 | 14 |
+| Plus a trigger | one order | 0.06 | 0.05 | 0.09 / 0.05 | 138 |
+| | both | 0.00 | 0.00 | 0.00 / 0.00 | 378 |
+| Plus a trigger and a 10-tick refractory | one order | **0.51** | **0.49** | 0.38 / 0.34 | 34 |
+| | both | 0.07 | 0.01 | 0.01 / 0.01 | 26 |
+
+(One-order rows: the cue that matches the taught order. The mismatched cue gave 0.00 in every case. Trigger rows at threshold 0.2 without refractory and 0.25 with; thresholds 0.15 and 0.2 with refractory gave at most 0.07.)
+
+What this says:
+
+- **As it was, nothing.** A cue changes nothing measurable, as expected from one sign.
+- **A trigger alone is a seizure.** A heard beat that makes the listener beat, with nothing to stop the echo, gives 5 to 27 times the normal number of beats.
+- **Trigger plus a short refractory replays one stored order from its head**, about half the time, and never backwards. But the same replay happens unprompted in 34–38% of windows, because any natural beat of the head unit starts it. So the cue adds little; the order is in the colony's spontaneous activity already.
+- **Two orders in one colony are not separable.** Selection failed at every threshold tried. The weights show why. Taught one order, the edge to the next unit in line is 0.14–0.23 and the edge two away is 0.04–0.11, so a threshold can pick out "next". Taught both, every edge among the four is 0.04–0.15 and "next" and "two away" overlap. The pairwise weights hold who-beat-near-whom and have no place to hold which order is meant.
+
+Two facts about the geometry found on the way:
+
+- Splitter outputs 0–1 read exactly zero while a unit idles and while it is blind, and 1.6–1.9 during a beat. Listening there gives a clean beat detector. Outputs 6–9 hear the lead-up as well.
+- The checkerboard only gives a beat for square sizes between about −12 and 8. A push that is too strong overshoots (size −20 reads 1.67, not a beat). So a linear excitatory edge is a band-pass, and the trigger used here is a hand-written threshold instead.
+
+The trigger and the refractory are hand-written additions that are not in `ecg.json`. They were switched on only at test time; the colony did not learn with them.
+
 ## How close to a neuron
 
 | A neuron has | The colony has | Standing |
@@ -113,7 +142,7 @@ Sol also noted that the C2 summaries for 1k, 4k and 16k seizures are identical. 
 | Synapses that follow history | `learned_weight` under the news rule | measured, one task |
 | Timing-dependent writing | an input before the beat is written, one after is not | resemblance only; nothing weakens a late edge |
 | Scaling that keeps a quiet cell alive | silent units shrink their incoming weights | hand-written and too weak: at 4× the learning rate the colony dies (0.5 of 6 alive) |
-| Excitation and inhibition | one sign: a heard beat quiets | missing |
+| Excitation and inhibition | one sign natively; a hand-written trigger was added for the third round | bolted on, not learned with |
 | Dendrites, cable, graded response | nothing | missing; a push is still all or none |
 
 ## Ledger
@@ -131,7 +160,7 @@ Sol also noted that the C2 summaries for 1k, 4k and 16k seizures are identical. 
 **Not shown**
 
 - That the memory is useful. It has not been set against any task or any simple sequence-memory baseline.
-- Selection: two stored orders, one cue, the colony following the cued one with weights unchanged. This is the next test.
+- Selection. Tested in the third round and not achieved: two orders in one set of pairwise weights could not be told apart by a cue.
 - That it lasts. Ordinary life keeps writing; the order fades without any seizure.
 - Unlearning. No rule makes a weight smaller for a reason.
 - Scale. Six units, 12 starts per history, one task, one Hebb variant.
@@ -150,6 +179,7 @@ In order of how much I would bet on each:
 ```bash
 python experiments/colony.py                 # about 6 minutes on 4 cores, writes results/colony.json
 python experiments/phase.py                  # about 4 minutes, writes results/phase.json
+python experiments/cue.py                    # about 5 minutes, writes results/cue.json
 python -m unittest discover -s tests -v      # 6 tests
 node tests/parity.js                         # browser arithmetic against Python
 python experiments/make_taps.py /path/to/GeometricNeuronOriginReview   # rebuilds gn/taps.json from the archived nodes

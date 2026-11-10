@@ -19,7 +19,42 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "experiments"))
 from gn.core import Colony, G, QMIN
 from gn.rules import pace
-from cue import N, OFF, tick, probe, score, teach
+from cue import N, OFF, score, teach
+
+S2 = G[:, 0] + G[:, 1]
+
+def tick(c, theta, refractory, force=None, trigger_filter=None):
+    """Fable's cue.tick with an optional sixteen-tap readout; identical otherwise."""
+    if not hasattr(c, "last_own"):
+        c.last_own = np.full(c.n, -999)
+    if theta:
+        if trigger_filter is None:
+            drive = (c.w * S2[c.q-QMIN][None, :]).sum(axis=1)
+        else:
+            drive = np.einsum("ijk,jk->i", trigger_filter, G[c.q-QMIN])
+        fire = drive > theta
+        if refractory:
+            fire &= (c.t-c.last_own) >= 10
+        trig = np.where(fire, -0.28, np.nan)
+        force = trig if force is None else np.where(np.isnan(force), trig, force)
+    own = c.step(force=force)
+    c.last_own = np.where(own > 3, c.t, c.last_own)
+    return own
+
+def probe(c, cue, theta, refractory, trigger_filter=None, window=40):
+    """Fable's exact first-onset readout, with optional learned tap filter."""
+    c = copy.deepcopy(c)
+    f = np.full(N, np.nan)
+    if cue is not None:
+        f[cue] = -0.28
+    own = np.array([tick(c, theta, refractory, force=f if k < 2 else None,
+                         trigger_filter=trigger_filter) for k in range(300)])
+    loud = own > 3
+    onsets = loud & ~np.vstack([np.zeros((1, N), bool), loud[:-1]])
+    first = [int(np.argmax(onsets[:window, u])) if onsets[:window, u].any() else None
+             for u in range(4)]
+    return first, int(onsets.sum())
+
 
 SEEDS, TRIALS, THETA, REFRACTORY = 12, 8, 0.25, True
 
@@ -197,7 +232,7 @@ def main():
         learned_stats.append({
             "adjacent_mean": float(np.mean([weights[i, j] for i, j in adjacent])),
             "shortcut_mean": float(np.mean([weights[i, j] for i, j in shortcuts])),
-            "tap_ranking_for_edge_0_to_1": list(np.argsort(-skill[1, 0])[:6].astype(int)),
+            "tap_ranking_for_edge_0_to_1": [int(k) for k in np.argsort(-skill[1, 0])[:6]],
             "edge_matrix_first4": weights[:4, :4].round(5).tolist(),
         })
         print("seed", seed, "adjacent", round(learned_stats[-1]["adjacent_mean"], 3),

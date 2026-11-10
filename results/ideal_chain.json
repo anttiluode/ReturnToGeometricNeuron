@@ -1,0 +1,103 @@
+{
+  "spec": {
+    "edge": 0.22,
+    "other_edge": 0.02,
+    "theta": 0.25,
+    "refractory_ticks": 10,
+    "seeds": 12,
+    "trials_per_seed": 8,
+    "window_ticks": 40,
+    "probe_ticks": 300,
+    "note": "Ideal and shuffled weights are hand-set, not learned."
+  },
+  "conditions": {
+    "learned_AB": {
+      "cue0_0123": 0.07291666666666667,
+      "cue3_3210": 0.010416666666666666,
+      "cue0_wrong_3210": 0,
+      "cue3_wrong_0123": 0,
+      "sham_0123": 0.010416666666666666,
+      "sham_3210": 0.010416666666666666,
+      "cue0_beats300": 31.125,
+      "cue3_beats300": 20.677083333333332,
+      "sham_beats300": 21.541666666666668,
+      "cue_advantage_0123": 0.0625,
+      "cue_advantage_3210": 0,
+      "cue_advantage_0123_seed_bootstrap95": [
+        0,
+        0.16666666666666666
+      ],
+      "cue_advantage_3210_seed_bootstrap95": [
+        0,
+        0
+      ],
+      "trials": 96
+    },
+    "ideal": {
+      "cue0_0123": 0.625,
+      "cue3_3210": 0.6770833333333334,
+      "cue0_wrong_3210": 0,
+      "cue3_wrong_0123": 0,
+      "sham_0123": 0.125,
+      "sham_3210": 0.2708333333333333,
+      "cue0_beats300": 36.916666666666664,
+      "cue3_beats300": 35.833333333333336,
+      "sham_beats300": 33.927083333333336,
+      "cue_advantage_0123": 0.5,
+      "cue_advantage_3210": 0.40625000000000006,
+      "cue_advantage_0123_seed_bootstrap95": [
+        0.3958333333333333,
+        0.6145833333333334
+      ],
+      "cue_advantage_3210_seed_bootstrap95": [
+        0.2916666666666667,
+        0.5416666666666666
+      ],
+      "trials": 96
+    },
+    "shuffled_ideal": {
+      "cue0_0123": 0.0625,
+      "cue3_3210": 0.010416666666666666,
+      "cue0_wrong_3210": 0,
+      "cue3_wrong_0123": 0,
+      "sham_0123": 0.041666666666666664,
+      "sham_3210": 0,
+      "cue0_beats300": 34.239583333333336,
+      "cue3_beats300": 37.90625,
+      "sham_beats300": 35.03125,
+      "cue_advantage_0123": 0.020833333333333336,
+      "cue_advantage_3210": 0.010416666666666666,
+      "cue_advantage_0123_seed_bootstrap95": [
+        0,
+        0.052083333333333336
+      ],
+      "cue_advantage_3210_seed_bootstrap95": [
+        0,
+        0.03125
+      ],
+      "trials": 96
+    },
+    "uniform": {
+      "cue0_0123": 0.020833333333333332,
+      "cue3_3210": 0,
+      "cue0_wrong_3210": 0,
+      "cue3_wrong_0123": 0,
+      "sham_0123": 0.010416666666666666,
+      "sham_3210": 0,
+      "cue0_beats300": 30.729166666666668,
+      "cue3_beats300": 31.833333333333332,
+      "sham_beats300": 30.010416666666668,
+      "cue_advantage_0123": 0.010416666666666666,
+      "cue_advantage_3210": 0,
+      "cue_advantage_0123_seed_bootstrap95": [
+        0,
+        0.03125
+      ],
+      "cue_advantage_3210_seed_bootstrap95": [
+        0,
+        0
+      ],
+      "trials": 96
+    }
+  }
+}

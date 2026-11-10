@@ -169,6 +169,19 @@ footer{margin-top:70px;color:var(--dim);font-size:14px}
 <tr><td>Uniform connections</td><td class="n">2.1%</td><td class="n">0%</td><td class="n">1.0%</td><td class="n">0%</td></tr>
 </table></div>
 <p>The cue helps the ideal chain: +50.0 percentage points for 0123 and +40.6 for 3210, relative to matched no-cue probes. So these dynamics <em>can</em> express two directions without extra context units. The obstacle is that the News rule does not learn those local connections. The successful matrix was specified by hand; the result does not establish learned selection, biological theta organization, or reliable replay on every trial. <a href="https://github.com/anttiluode/ReturnToGeometricNeuron/blob/main/experiments/ideal_chain.py">Experiment code</a> · <a href="https://github.com/anttiluode/ReturnToGeometricNeuron/blob/main/results/ideal_chain.json">Results</a>.</p>
+<h2>Fifth round: learn which neighbour to hear, then learn which tap</h2>
+<p>We gave the six existing loops a new local teaching rule, without changing the oscillator: when a unit beats, credit its <strong>nearest preceding</strong> neighbour if the previous beat was 1–5 ticks earlier. A separate readout learns a weight on all sixteen taps from event timing, with a penalty for common idle transitions. The trigger and refractory are still Fable's third-round additions. Both rules are <strong>hand-designed</strong>; the edge structure and tap coefficients come from experience, not from an installed chain.</p>
+<div class="tablewrap"><table>
+<tr><th>Weights frozen after training</th><th>Cue 0: 0123</th><th>Cue 3: 3210</th><th>No cue: 0123</th><th>No cue: 3210</th></tr>
+<tr><td>Original News learning, two orders</td><td class="n">7.3%</td><td class="n">1.0%</td><td class="n">1.0%</td><td class="n">1.0%</td></tr>
+<tr><td><strong>Nearest-predecessor learning; fixed taps 0–1</strong></td><td class="n"><strong>68.8%</strong></td><td class="n"><strong>80.2%</strong></td><td class="n">3.1%</td><td class="n">32.3%</td></tr>
+<tr><td>Same learned edges; fixed early taps 6–7</td><td class="n">64.6%</td><td class="n">67.7%</td><td class="n">4.2%</td><td class="n">12.5%</td></tr>
+<tr><td>Same learned edges; <strong>learned 16-tap filters</strong></td><td class="n">65.6%</td><td class="n">66.7%</td><td class="n">12.5%</td><td class="n">17.7%</td></tr>
+<tr><td>Same learned edges; tap positions shuffled</td><td class="n">3.1%</td><td class="n">0%</td><td class="n">3.1%</td><td class="n">0%</td></tr>
+<tr><td>Learned edges and filters, unit labels shuffled</td><td class="n">2.1%</td><td class="n">5.2%</td><td class="n">0%</td><td class="n">5.2%</td></tr>
+</table></div>
+<p>Across 12 random starts × 8 checkpoints, the learned immediately adjacent edges averaged <strong>0.198</strong>, while shortcuts averaged <strong>0.032</strong>. The local timing rule actually constructed a usable bidirectional chain. But the learned tap filter <strong>did not beat the simple fixed tap-0/1 detector</strong>. Shuffling learned taps broke routing and produced excess beats; tap identity matters, but this adaptive filter was not better than a known good observation.</p>
+<p>This is not yet a general learning system: the nearest-event window (1–5 ticks), gain, trigger and refractory were hand-chosen, and the training sequence has three-tick spacing. We did not test unseen temporal gaps or arbitrary context switching. <a href="https://github.com/anttiluode/ReturnToGeometricNeuron/blob/main/experiments/tap_learning_round5.py">Python experiment</a> · <a href="https://github.com/anttiluode/ReturnToGeometricNeuron/blob/main/results/tap_learning_round5.json">Complete data</a>.</p>
 <h2>How close is it to a neuron</h2>
 <div class="tablewrap"><table>
 <tr><th>A neuron has</th><th>The colony has</th><th>Standing</th></tr>
@@ -193,7 +206,7 @@ footer{margin-top:70px;color:var(--dim);font-size:14px}
 </ul></div>
 <div class="card"><h3>Not shown</h3><ul>
 <li>That the memory is useful. It orders beats and directs influence; it has not been set against any task or any simple sequence-memory baseline.</li>
-<li><strong>Learned</strong> selection: the dual-order News weights still fail. Hand-specified local bidirectional weights do support cue-sensitive replay, but have not been learned.</li>
+<li>The new fifth-round nearest-predecessor learning rule does construct local bidirectional connections and supports cue-sensitive replay; arbitrary context switching and unseen-gap generalization remain unshown.</li>
 <li>That it lasts. Ordinary life keeps writing, and the order fades with no seizure at all.</li>
 <li>Unlearning. No rule here makes a weight smaller for a reason.</li>
 <li>Anything beyond six units, 12 starts per order, one task, one hebb rule as comparison.</li>
